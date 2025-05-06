@@ -40,11 +40,11 @@
 //funzione di supporto per il parse dei json
 //* (volendo fare senza raccogliere in variabile l'await della variabile response 
 //* per poi applicare il metodo .json())
-async function fetchData(url) {
-    const res = await fetch(url)
-    const obj = res.json()
-    return obj
-}
+// async function fetchData(url) {
+//     const res = await fetch(url)
+//     const obj = res.json()
+//     return obj
+// }
 
 const getChefBirthday = async (id) => {
 
