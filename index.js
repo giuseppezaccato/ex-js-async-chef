@@ -38,6 +38,8 @@
 //---------------------------------------------RISOLUZIONE ESERCIZIO-----------------------------------------
 
 //funzione di supporto per il parse dei json
+//* (volendo fare senza raccogliere in variabile l'await della variabile response 
+//* per poi applicare il metodo .json())
 async function fetchData(url) {
     const res = await fetch(url)
     const obj = res.json()
@@ -48,25 +50,52 @@ const getChefBirthday = async (id) => {
 
     let recipe
     try {
-        recipe = await fetchData(`https://dummyjson.com/recipes/${id}`)
+        const resRecipe = await fetch(`https://dummyjson.com/recipes/${id}`)
+        recipe = await resRecipe.json()
     } catch (error) {
+        console.error(error)
         throw new Error('problema con fetch recipe', error.message)
+    }
+
+    //?controllo per capire dove sta l'errore nel caso in cui recipe.message == true
+    if (recipe.message) {
+        throw new Error(recipe.message)
     }
 
     let chef
     try {
-        chef = await fetchData(`https://dummyjson.com/users/${recipe.userId}`)
+        const resChef = await fetch(`https://dummyjson.com/users/${recipe.userId}`)
+        chef = await resChef.json()
     } catch (error) {
+        console.error(error)
         throw new Error('problema con fetch chef', error.message)
-    } finally {
-        console.log('codice eseguito COMUNQUE(finally)')
+
     }
-    const nuovaData = dayjs(chef.birthDate).format('DD / MM / YYYY')
-    return nuovaData
+
+    //?controllo per capire dove sta l'errore nel caso in cui chef.message == true
+    if (chef.message) {
+        throw new Error(chef.message)
+    }
+
+    //? volendo potremmo utilizzare una variabile da assegnare al metodo così:
+    //* const birthdayDate = dayjs(chef.birthDate).format('DD / MM / YYYY') 
+    //* e successivamente ritornare la variabile
+    return dayjs(chef.birthDate).format('DD / MM / YYYY')
+
 }
 
+//funzione esempio tradizionale
+// getChefBirthday(10)
+//     .then(birthday => console.log("Data di nascita dello chef:", birthday))
+//     .catch(error => console.error("Errore:", error.message));
 
-getChefBirthday(10)
-    .then(birthday => console.log("Data di nascita dello chef:", birthday))
-    .catch(error => console.error("Errore:", error.message));
+//trasformazione con async/await
+(async () => {
+    try {
+        const birthday = await getChefBirthday(3);
+        console.log("Data di nascita dello Chef:", birthday)
+    } catch (error) {
+        console.error("Errore:", error.message)
+    }
+})();
 
